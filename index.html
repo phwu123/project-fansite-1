@@ -3,9 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="./src/_base/_base.css" />
+  <link rel="stylesheet" type="text/css" href="index.css" />
+  <script type="module" src="./src/components/TestComponents/TestComponentA.mjs"></script>
+  <script type="module" src="./src/components/TestComponents/TestComponentB.mjs"></script>
+  <script type="module" src="./src/components/TestComponents/TestButton.mjs"></script>
+  <script type="module" src="./src/components/RouterView/RouterView.mjs"></script>
+  <title>Fansite</title>
 </head>
 <body>
-  
+  <noscript>
+    <p>Javascript is disabled, please enable javascript for the full experience</p>
+  </noscript>
+  <header>top</header>
+  <router-view></router-view>
+  <footer>bot</footer>
 </body>
 </html>

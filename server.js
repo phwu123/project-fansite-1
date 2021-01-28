@@ -1,14 +1,18 @@
 // mdn: https://developer.mozilla.org/en-US/docs/Learn/Server-side/Node_server_without_framework
 
 const http = require('http');
-const fs = require('fs');
+// const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 const port = 3000
-http.createServer((req, res) => {
+const {allowedRoutes} = require('./Routes.js')
+http.createServer(async (req, res) => {
   let filePath = '.' + req.url;
   if (filePath === './') {
     filePath = './index.html'
   }
+  console.log('path', filePath)
+
   const extname = String(path.extname(filePath)).toLowerCase();
   const mimeTypes = {
       '.html': 'text/html',
@@ -31,24 +35,33 @@ http.createServer((req, res) => {
 
   const contentType = mimeTypes[extname] || 'application/octet-stream';
 
-  fs.readFile(filePath, (error, content) => {
-    if (error) {
-      if(error.code == 'ENOENT') {
-        // fs.readFile('./404.html', function(error, content) {
-        //     res.writeHead(404, { 'Content-Type': 'text/html' });
-        //     res.end(content, 'utf-8');
-        // });
-        res.writeHead(404, { 'Content-Type': 'text/html' });
-        res.end(content, 'utf-8');
-      } else {
-        res.writeHead(500);
-        res.end('Sorry, check with the site admin for error: '+error.code+' ..\n');
-      }
-    } else {
-      res.writeHead(200, { 'Content-Type': contentType });
-      res.end(content, 'utf-8');
+  const allowedRoute = allowedRoutes.includes(filePath)
+  let baseContent;
+  if (allowedRoute) {
+    try {
+      const indexContent = await fs.readFile('./index.html');
+      baseContent = indexContent;
+    } catch (err) {
+      console.log('failed to read index: ', err)
     }
-  });
+  }
+  
+  try {
+    const content = await fs.readFile(filePath);
+    res.writeHead(200, { 'Content-Type': contentType });
+    res.end(content, 'utf-8');
+  } catch (err) {
+    console.log('no file or directory: ', err)
+    if (allowedRoute) { // keep route
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(baseContent, 'utf-8');
+    } else { // reroute to index
+      res.writeHead(302, { 'Location': '.' })
+      res.end()
+    }
+    // res.writeHead(404, { 'Content-Type': 'text/html' });
+    // res.end();
+  }
 }).listen(port, () => {
   console.log('listening on port ', port)
 })

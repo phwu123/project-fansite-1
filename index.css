@@ -1,0 +1,13 @@
+:root {
+  --font-size: 10px;
+
+  --color-main-font: white;
+  --color-main-bg: black;
+}
+
+body {
+  background-color: var(--color-main-bg);
+  font-size: var(--font-size);
+  color: var(--color-main-font);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-right);
+}
